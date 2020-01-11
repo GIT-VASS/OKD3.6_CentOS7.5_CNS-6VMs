@@ -1,0 +1,262 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.hostmanager.ignore_private_ip = false
+
+
+
+  config.vm.define "lbone-okd36" do |lbone|
+      lbone.vm.box = "centos/7"
+      lbone.vm.hostname = "lb-one.192.168.44.7.xip.io"
+      lbone.vm.network "private_network", ip: "192.168.44.7"
+      lbone.vm.provision "shell", path: "./nodes/config.sh"
+      lbone.vm.provider "virtualbox" do |v|
+          v.name = "lb-one-okd36"
+          v.memory = 512
+          v.cpus = 1
+      end
+  end
+
+  config.vm.define "mastertwo-okd36" do |mastertwo|
+      mastertwo.vm.box = "centos/7"
+      mastertwo.vm.hostname = "master-two.192.168.44.3.xip.io"
+      mastertwo.vm.network "private_network", ip: "192.168.44.3"
+      mastertwo.vm.provision "shell", path: "./nodes/config.sh"
+      mastertwo.vm.provider "virtualbox" do |v|
+        v.name = "master-two-okd36"
+        v.memory = 2000
+        v.cpus = 1
+        #
+         # Add first disk
+        #
+        unless File.exists?(".okd36Storage/master-two/sdb.vdi")
+        v.customize [
+          'createmedium', 'disk',
+          '--filename', ".okd36Storage/master-two/sdb.vdi",
+          '--format', 'VDI',
+          '--size', 20 * 1024
+        ]
+        end
+        v.customize [
+       'storageattach', :id,
+       '--storagectl', 'IDE',
+       '--port', 1,
+       '--device', 0,
+       '--type', 'hdd',
+       '--medium', ".okd36Storage/master-two/sdb.vdi"
+        ]
+      end
+  end
+
+  config.vm.define "masterthree-okd36" do |masterthree|
+      masterthree.vm.box = "centos/7"
+      masterthree.vm.hostname = "master-three.192.168.44.4.xip.io"
+      masterthree.vm.network "private_network", ip: "192.168.44.4"
+      masterthree.vm.provision "shell", path: "./nodes/config.sh"
+      masterthree.vm.provider "virtualbox" do |v|
+          v.name = "master-three-okd36"
+          v.memory = 2000
+          v.cpus = 1
+          #
+           # Add first disk
+          #
+          unless File.exists?(".okd36Storage/master-three/sdb.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', ".okd36Storage/master-three/sdb.vdi",
+            '--format', 'VDI',
+            '--size', 20 * 1024
+          ]
+          end
+          v.customize [
+         'storageattach', :id,
+         '--storagectl', 'IDE',
+         '--port', 1,
+         '--device', 0,
+         '--type', 'hdd',
+         '--medium', ".okd36Storage/master-three/sdb.vdi"
+          ]
+        #
+        # Increase portcount for second disk
+        #
+        v.customize [
+          'storagectl', :id,
+          '--name', 'IDE',
+          '--portcount', 2
+        ]
+        #
+        # Add second disk
+        #
+        unless File.exists?(".okd36Storage/master-three/sdc.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', ".okd36Storage/master-three/sdc.vdi",
+            '--format', 'VDI',
+            '--size', 50 * 1024
+          ]
+        end
+        v.customize [
+              'storageattach', :id,
+              '--storagectl', 'IDE',
+              '--port', 1,
+              '--device', 1,
+              '--type', 'hdd',
+              '--medium', ".okd36Storage/master-three/sdc.vdi"
+            ]
+      end
+  end
+
+  config.vm.define "infraone-okd36" do |infraone|
+      infraone.vm.box = "centos/7"
+      infraone.vm.hostname = "infra.192.168.44.5.xip.io"
+      infraone.vm.network "private_network", ip: "192.168.44.5"
+      infraone.vm.provision "shell", path: "./nodes/config.sh"
+      infraone.vm.provider "virtualbox" do |v|
+          v.name = "infra-one-okd36"
+          v.memory = 2000
+          v.cpus = 1
+
+          #
+           # Add first disk
+          #
+          unless File.exists?(".okd36Storage/infra-one/sdb.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', ".okd36Storage/infra-one/sdb.vdi",
+            '--format', 'VDI',
+            '--size', 20 * 1024
+          ]
+          end
+          v.customize [
+         'storageattach', :id,
+         '--storagectl', 'IDE',
+         '--port', 1,
+         '--device', 0,
+         '--type', 'hdd',
+         '--medium', ".okd36Storage/infra-one/sdb.vdi"
+          ]
+        #
+        # Increase portcount for second disk
+        #
+        v.customize [
+          'storagectl', :id,
+          '--name', 'IDE',
+          '--portcount', 2
+        ]
+        #
+        # Add second disk
+        #
+        unless File.exists?(".okd36Storage/infra-one/sdc.vdi")
+          v.customize [
+            'createmedium', 'disk',
+            '--filename', ".okd36Storage/infra-one/sdc.vdi",
+            '--format', 'VDI',
+            '--size', 50 * 1024
+          ]
+        end
+        v.customize [
+              'storageattach', :id,
+              '--storagectl', 'IDE',
+              '--port', 1,
+              '--device', 1,
+              '--type', 'hdd',
+              '--medium', ".okd36Storage/infra-one/sdc.vdi"
+            ]
+          end
+
+  end
+
+  config.vm.define "appone-okd36" do |appone|
+      appone.vm.box = "centos/7"
+      appone.vm.hostname = "app-one.192.168.44.6.xip.io"
+      appone.vm.network "private_network", ip: "192.168.44.6"
+      appone.vm.provision "shell", path: "./nodes/config.sh"
+      appone.vm.provider "virtualbox" do |v|
+          v.name = "app-one-okd36"
+          v.memory = 2000
+          v.cpus = 1
+      #
+       # Add first disk
+      #
+      unless File.exists?(".okd36Storage/app-one/sdb.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', ".okd36Storage/app-one/sdb.vdi",
+        '--format', 'VDI',
+        '--size', 20 * 1024
+      ]
+      end
+      v.customize [
+     'storageattach', :id,
+     '--storagectl', 'IDE',
+     '--port', 1,
+     '--device', 0,
+     '--type', 'hdd',
+     '--medium', ".okd36Storage/app-one/sdb.vdi"
+      ]
+    #
+    # Increase portcount for second disk
+    #
+    v.customize [
+      'storagectl', :id,
+      '--name', 'IDE',
+      '--portcount', 2
+    ]
+    #
+    # Add second disk
+    #
+    unless File.exists?(".okd36Storage/app-one/sdc.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', ".okd36Storage/app-one/sdc.vdi",
+        '--format', 'VDI',
+        '--size', 50 * 1024
+      ]
+    end
+    v.customize [
+          'storageattach', :id,
+          '--storagectl', 'IDE',
+          '--port', 1,
+          '--device', 1,
+          '--type', 'hdd',
+          '--medium', ".okd36Storage/app-one/sdc.vdi"
+        ]
+      end
+  end
+
+  config.vm.define "masterone-okd36" do |masterone|
+      masterone.vm.box = "centos/7"
+      masterone.vm.hostname = "master-one.192.168.44.2.xip.io"
+      masterone.vm.network "private_network", ip: "192.168.44.2"
+      masterone.vm.provision "file", source: "./password/password.txt", destination: "/tmp/password.txt"
+      masterone.vm.provision "file", source: "./ansible_conf/ansible.cfg", destination: "/tmp/ansible.cfg"
+      masterone.vm.provision "file", source: "../ansible", destination: "/tmp/"
+      masterone.vm.provision "shell", path: "./bastion/configbastion.sh"
+      masterone.vm.provider "virtualbox" do |v|
+        v.name = "master-one-okd36"
+        v.memory = 2000
+        v.cpus = 1
+      #
+       # Add first disk
+      #
+      unless File.exists?(".okd36Storage/master-one/sdb.vdi")
+      v.customize [
+        'createmedium', 'disk',
+        '--filename', ".okd36Storage/master-one/sdb.vdi",
+        '--format', 'VDI',
+        '--size', 20 * 1024
+      ]
+      end
+      v.customize [
+     'storageattach', :id,
+     '--storagectl', 'IDE',
+     '--port', 1,
+     '--device', 0,
+     '--type', 'hdd',
+     '--medium', ".okd36Storage/master-one/sdb.vdi"
+      ]
+      end
+  end
+end
