@@ -7,6 +7,15 @@
     gpgcheck: no
     enabled: yes
 
+- name: Add repository Gluster7.2
+  yum_repository:
+    name: Gluster7.2
+    description: Gluster7.2
+    baseurl: http://mirror.centos.org/centos-7/7.7.1908/storage/x86_64/gluster-7
+    gpgcheck: no
+    enabled: yes
+
+
 - name: Configuring Hosts to Use DNS
   template:
     src: resolv.conf.j2
