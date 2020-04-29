@@ -4,6 +4,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.enabled = true
   config.hostmanager.manage_host = true
   config.hostmanager.ignore_private_ip = false
+  config.vm.synced_folder '.', '/vagrant', disabled: true
 
 
 
